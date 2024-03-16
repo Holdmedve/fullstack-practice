@@ -41,7 +41,7 @@ public class TestCarHandler
         var result = await CarHandler.GetCar(id: expectedId, db: db);
 
         Assert.IsType<Results<Ok<Car>, NotFound>>(result);
-        Car carResult = ((Ok<Car>) result.Result).Value;
+        var carResult = ((Ok<Car>) result.Result).Value;
         Assert.Equal(expected: expectedId, actual: carResult.Id);
     }
 
@@ -57,5 +57,34 @@ public class TestCarHandler
         Assert.IsType<Results<Ok<Car>, NotFound>>(result);
         var notFoundResult = (NotFound) result.Result;
         Assert.NotNull(notFoundResult);
+    }
+
+    [Fact]
+    public async void TestDeleteCar_CarWithIdDoesNotExist_ReturnsNotFound()
+    {
+        DbContextOptionsBuilder<CarDb> dbOptionsBuilder = new DbContextOptionsBuilder<CarDb>();
+        dbOptionsBuilder.UseInMemoryDatabase("TestCarDatabase");
+        CarDb db = new CarDb(dbOptionsBuilder.Options);
+
+        var result = await CarHandler.DeleteCar(id: 42, db: db);
+
+        Assert.IsType<Results<NoContent, NotFound>>(result);
+        var notFoundResult = (NotFound) result.Result;
+        Assert.NotNull(notFoundResult);
+    }
+
+    [Fact]
+    public async void TestDeleteCar_CarWithIdExists_CarIsDeletedFromDb()
+    {
+        DbContextOptionsBuilder<CarDb> dbOptionsBuilder = new DbContextOptionsBuilder<CarDb>();
+        dbOptionsBuilder.UseInMemoryDatabase("TestCarDatabase");
+        CarDb db = new CarDb(dbOptionsBuilder.Options);
+        int id = 42;
+        db.Cars.Add(new Car{Id = id, Brand = "bmw", IsElectric = false});
+
+        var result = await CarHandler.DeleteCar(id: id, db: db);
+
+        var carResult = db.Cars.Find(id);
+        Assert.Null(carResult);
     }
 }

@@ -4,7 +4,7 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 public static class CarHandler
 {
-    public static async Task<IResult> CreateCar(Car car, CarDb db)
+    public static async Task<Created<Car>> CreateCar(Car car, CarDb db)
     {
         db.Cars.Add(car);
         await db.SaveChangesAsync();
@@ -17,5 +17,17 @@ public static class CarHandler
             is Car car
                 ? TypedResults.Ok(car)
                 : TypedResults.NotFound();
+    }
+
+    public static async Task<Results<NoContent, NotFound>> DeleteCar(int id, CarDb db)
+    {
+        var car = await db.Cars.FindAsync(id);
+        if (car == null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        db.Remove(car);
+        return TypedResults.NoContent();
     }
 }

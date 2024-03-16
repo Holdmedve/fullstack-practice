@@ -9,5 +9,6 @@ var app = builder.Build();
 
 app.MapPost("/cars/", CarHandler.CreateCar);
 app.MapGet("/cars/{id}", CarHandler.GetCar);
+app.MapDelete("/cars/{id}", CarHandler.DeleteCar);
 
 app.Run();
