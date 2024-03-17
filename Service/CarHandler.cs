@@ -30,4 +30,21 @@ public static class CarHandler
         db.Remove(car);
         return TypedResults.NoContent();
     }
+
+    public static async Task<Results<Created<Car>, NotFound>> UpdateCar(Car carUpdate, CarDb db)
+    {
+        var car = await db.Cars.FindAsync(carUpdate.Id);
+        if (car == null)
+        {
+            return TypedResults.NotFound();
+        }
+
+        car.Id = carUpdate.Id;
+        car.IsElectric = carUpdate.IsElectric;
+        car.Brand = carUpdate.Brand;
+
+        db.Cars.Update(car);
+        return TypedResults.Created($"/cars/{car.Id}", car);
+
+    }
 }
