@@ -4,8 +4,20 @@ using Microsoft.AspNetCore.Http.HttpResults;
 
 public static class CarHandler
 {
-    public static async Task<Created<Car>> CreateCar(Car car, CarDb db)
+    public static async Task<Created<Car>> CreateCar(
+        Car car, 
+        CarDb db,
+        IDateTime dateTime,
+        ILogger logger,
+        DbConfig dbConfig        
+    )
     {
+        logger.LogDebug($"the current datetime is: {dateTime.Now}");
+        logger.LogInformation($"the current datetime is: {dateTime.Now}");
+        logger.LogWarning($"the current datetime is: {dateTime.Now}");
+        logger.LogError($"the current datetime is: {dateTime.Now}");
+        logger.LogInformation($"The database name is: {dbConfig.Name}");
+
         db.Cars.Add(car);
         await db.SaveChangesAsync();
         return TypedResults.Created($"/cars/{car.Id}", car);
